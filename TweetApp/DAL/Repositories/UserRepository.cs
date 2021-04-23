@@ -34,7 +34,7 @@ namespace TweetApp.DAL.Repositories
         {
             try
             {
-                return await _context.Users.Include(p => p.Tweets).SingleOrDefaultAsync(x => x.Email == username);
+                return await _context.Users.Include(p => p.Tweets).SingleOrDefaultAsync(x => x.LoginId == username);
             }
             catch (Exception ex)
             {

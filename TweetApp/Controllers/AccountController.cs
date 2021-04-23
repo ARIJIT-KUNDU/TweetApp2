@@ -10,7 +10,8 @@ using TweetApp.Entities;
 namespace TweetApp.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class AccountController : Controller
     {
         private readonly DataContext _context;
@@ -26,16 +27,17 @@ namespace TweetApp.Controllers
         {
             try
             {
-                if (await UserExists(registerDto.Email)) return BadRequest("Username is taken");
+                if (await UserExists(registerDto.LoginId)) return BadRequest("Username is taken");
 
                 var user = new AppUser
                 {
                     FirstName = registerDto.Firstname,
                     LastName = registerDto.Lastname,
-                    Gender = registerDto.Gender,
-                    Dob = registerDto.Dob,
+                    
                     Email = registerDto.Email.ToLower(),
-                    Password = registerDto.Password
+                    LoginId=registerDto.LoginId.ToLower(),
+                    Password = registerDto.Password,
+                    ContactNumber=registerDto.ContactNumber
                 };
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
@@ -43,10 +45,11 @@ namespace TweetApp.Controllers
                 {
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    Gender = user.Gender,
-                    Dob = user.Dob,
+                    
                     Email = user.Email,
-                    Password = user.Password
+                    LoginId=user.LoginId,
+                    Password = user.Password,
+                    ContactNumber=user.ContactNumber
                 };
             }
             catch(Exception ex)
@@ -54,22 +57,23 @@ namespace TweetApp.Controllers
                 return BadRequest("Error occurred while registering");
             }
         }
-        [HttpPost,Route("login")]
+        [HttpGet,Route("login")]
         public async Task<ActionResult<AppUser>> Login(LoginDto loginDto)
         {
             try
             {
-                var user = await _context.Users.SingleOrDefaultAsync(x => x.Email == loginDto.Username);
+                var user = await _context.Users.SingleOrDefaultAsync(x => x.LoginId == loginDto.Username);
                 if (user == null) return Unauthorized("Invalid username");
                 if (loginDto.Password != user.Password) return Unauthorized("Invalid password");
                 return new AppUser
                 {
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    Gender = user.Gender,
-                    Dob = user.Dob,
+                   
                     Email = user.Email,
-                    Password = user.Password
+                    LoginId=user.LoginId,
+                    Password = user.Password,
+                    ContactNumber=user.ContactNumber
                 };
             }
             catch (Exception ex)
@@ -77,9 +81,9 @@ namespace TweetApp.Controllers
                 return BadRequest("Error occurred while logging in");
             }
         }
-        private async Task<bool> UserExists(string email)
+        private async Task<bool> UserExists(string loginId)
         {
-            return await _context.Users.AnyAsync(x => x.Email == email.ToLower());
+            return await _context.Users.AnyAsync(x => x.LoginId == loginId.ToLower());
         }
     }
 }

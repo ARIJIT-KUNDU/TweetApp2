@@ -10,10 +10,11 @@ namespace TweetApp.Entities
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Gender { get; set; }
-        public DateTime Dob { get; set; }
+        
         public string Email { get; set; }
+        public string LoginId { get; set; }
         public string Password { get; set; }
+        public long ContactNumber { get; set; }
         public ICollection<Tweet> Tweets { get; set; }
     }
 }

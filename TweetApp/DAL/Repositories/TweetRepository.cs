@@ -39,5 +39,26 @@ namespace TweetApp.DAL.Repositories
                 throw ex;
             }
         }
+
+        public async Task<IEnumerable<Tweet>> GetTweetsAsync()
+        {
+            try
+            {
+                return await _context.Tweets.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public Task<IEnumerable<Tweet>> AddTweet(Tweet tweet)
+        {
+            try
+            {
+
+            }
+            catch { }
+        }
     }
 }

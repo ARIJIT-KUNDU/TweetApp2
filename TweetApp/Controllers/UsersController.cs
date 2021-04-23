@@ -9,8 +9,9 @@ using TweetApp.Entities;
 
 namespace TweetApp.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -22,7 +23,7 @@ namespace TweetApp.Controllers
             _userRepository = userRepository;
             
         }
-        [HttpGet,Route("users")]
+        [HttpGet,Route("all")]
 
         public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
         {
@@ -37,7 +38,7 @@ namespace TweetApp.Controllers
             }
 
         }
-        [HttpGet,Route("users/{username}")]
+        [HttpGet,Route("{username}")]
 
         public async Task<ActionResult<AppUser>> GetUser(string username)
         {
@@ -51,7 +52,7 @@ namespace TweetApp.Controllers
             }
 
         }
-        [HttpPut,Route("resetPassword")]
+        [HttpGet,Route("{username}/forgot")]
         public async Task<ActionResult> ResetPassword(PasswordResetDto passwordResetDto,string username)
         {
 
@@ -69,11 +70,7 @@ namespace TweetApp.Controllers
                 return BadRequest("Error occurred while resetting password");
             }
         }
-        //[HttpPost("add-tweet")]
-        //public async Task<TweetDto> AddTweet(TweetDto tweet)
-        //{
-        //    var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-        //    var result = await _tweetService.AddTweetAsync(tweet);
-        //}
+        
+        
     }
 }
