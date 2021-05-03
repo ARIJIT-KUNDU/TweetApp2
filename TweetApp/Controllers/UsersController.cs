@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,22 +7,25 @@ using System.Threading.Tasks;
 using TweetApp.DAL.Interfaces;
 using TweetApp.DTOs;
 using TweetApp.Entities;
+using TweetApp.Services;
 
 namespace TweetApp.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version}/[controller]")]
     public class UsersController : Controller
     {
-        private readonly IUserRepository _userRepository;
         
+        
+        private readonly IUserRepository _userRepository;
 
         public UsersController(IUserRepository userRepository)
         {
 
-            _userRepository = userRepository;
             
+           
+            _userRepository = userRepository;
         }
         [HttpGet,Route("all")]
 
@@ -29,7 +33,7 @@ namespace TweetApp.Controllers
         {
             try
             {
-                var users = await _userRepository.GetUsersAsync();
+                var users =await  _userRepository.GetUsersAsync();
                 return Ok(users);
             }
             catch(Exception ex)
@@ -38,7 +42,7 @@ namespace TweetApp.Controllers
             }
 
         }
-        [HttpGet,Route("{username}")]
+        [HttpGet, Route("search/{username}")]
 
         public async Task<ActionResult<AppUser>> GetUser(string username)
         {
@@ -52,8 +56,8 @@ namespace TweetApp.Controllers
             }
 
         }
-        [HttpGet,Route("{username}/forgot")]
-        public async Task<ActionResult> ResetPassword(PasswordResetDto passwordResetDto,string username)
+        [HttpGet, Route("{username}/forgot")]
+        public async Task<ActionResult> ResetPassword(PasswordResetDto passwordResetDto, string username)
         {
 
             try
@@ -62,15 +66,15 @@ namespace TweetApp.Controllers
                 if (user.Password == passwordResetDto.OldPassword)
                     user.Password = passwordResetDto.NewPassword;
                 _userRepository.Update(user);
-                if (await _userRepository.SaveAllAsync()) return NoContent();
-                return BadRequest("Failed to reset password");
+                 return NoContent();
+                //return BadRequest("Failed to reset password");
             }
             catch (Exception ex)
             {
                 return BadRequest("Error occurred while resetting password");
             }
         }
-        
-        
+
+
     }
 }

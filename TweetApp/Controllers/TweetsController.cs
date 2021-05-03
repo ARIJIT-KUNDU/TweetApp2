@@ -11,7 +11,7 @@ namespace TweetApp.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version}/[controller]")]
     public class TweetsController : Controller
     {
         private readonly ITweetRepository _tweetRepository;
@@ -52,11 +52,11 @@ namespace TweetApp.Controllers
                 return BadRequest("Error occurred while getting tweets");
             }
         }
-        [HttpPost, Route("{memberId}/add")]
-        public async Task<Tweet> AddTweet(Tweet tweet)
-        {
+        //[HttpPost, Route("{memberId}/add")]
+        //public async Task<Tweet> AddTweet(Tweet tweet)
+        //{
 
-        }
+        //}
 
     }
 }

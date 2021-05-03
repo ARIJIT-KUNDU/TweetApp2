@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,19 +13,24 @@ namespace TweetApp.DAL.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly DataContext _context;
-        
+        private readonly IDataContext _context;
+        private IMongoCollection<AppUser> _dbCollection;
 
-        public UserRepository(DataContext context)
+        public UserRepository(IDataContext context,IOptions<TweetAppDatabaseSettings> options)
         {
             _context = context;
-            
+            _dbCollection = _context.tweetappdb.GetCollection<AppUser>(options.Value.UsersCollectionName);
         }
         public async Task<AppUser> GetUserByIdAsync(int id)
         {
             try
             {
-                return await _context.Users.FindAsync(id);
+                
+                FilterDefinition<AppUser> filter = Builders<AppUser>.Filter.Eq("Id", id);
+
+                return await _dbCollection.FindAsync(filter).Result.FirstOrDefaultAsync();
+                
+
             }
             catch(Exception ex)
             {
@@ -34,7 +42,8 @@ namespace TweetApp.DAL.Repositories
         {
             try
             {
-                return await _context.Users.Include(p => p.Tweets).SingleOrDefaultAsync(x => x.LoginId == username);
+                FilterDefinition<AppUser> filter = Builders<AppUser>.Filter.Eq("LoginId", username);
+                return await _dbCollection.FindAsync(filter).Result.FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +55,8 @@ namespace TweetApp.DAL.Repositories
         {
             try
             {
-                return await _context.Users.Include(p => p.Tweets).ToListAsync();
+                var users = await _dbCollection.Find(_=>true).ToListAsync(); 
+                return users;
             }
             catch (Exception ex)
             {
@@ -54,23 +64,24 @@ namespace TweetApp.DAL.Repositories
             }
         }
 
-        public async Task<bool> SaveAllAsync()
-        {
-            try
-            {
-                return await _context.SaveChangesAsync() > 0;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+        //public async Task<bool> SaveAllAsync()
+        //{
+        //    try
+        //    {
+        //        return await _dbCollection.SaveChangesAsync() > 0;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
 
         public void Update(AppUser user)
         {
             try
             {
-                _context.Entry(user).State = EntityState.Modified;
+                _dbCollection.ReplaceOne(m => m._id == user._id, user);
+                
             }
             catch (Exception ex)
             {

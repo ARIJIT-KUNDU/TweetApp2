@@ -10,6 +10,6 @@ namespace TweetApp.DAL.Interfaces
     {
         public Task<IEnumerable<Tweet>> GetTweetsAsync(int memberId);
         public Task<IEnumerable<Tweet>> GetTweetsAsync();
-        public Task<IEnumerable<Tweet>> AddTweet(Tweet tweet);
+        //public Task<IEnumerable<Tweet>> AddTweet(Tweet tweet);
     }
 }

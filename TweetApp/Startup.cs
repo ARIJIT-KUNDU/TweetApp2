@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -14,6 +15,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using TweetApp.DAL.Interfaces;
 using TweetApp.DAL.Repositories;
+using TweetApp.Entities;
+using TweetApp.Services;
 
 namespace TweetApp
 {
@@ -30,11 +33,11 @@ namespace TweetApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<DataContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            });
+            services.Configure<TweetAppDatabaseSettings>(Configuration.GetSection(nameof(TweetAppDatabaseSettings)));
+            services.AddSingleton<ITweetAppDatabaseSettings>(sp => sp.GetRequiredService<IOptions<TweetAppDatabaseSettings>>().Value);
+            services.AddSingleton<IDataContext, DataContext>();
             services.AddScoped<IUserRepository, UserRepository>();
+            //services.AddScoped<iac>
             services.AddCors();
         }
 

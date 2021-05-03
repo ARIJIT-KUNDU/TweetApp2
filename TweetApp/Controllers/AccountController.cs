@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TweetApp.DAL.Interfaces;
 using TweetApp.DTOs;
 using TweetApp.Entities;
 
@@ -11,16 +14,17 @@ namespace TweetApp.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version}/[controller]")]
     public class AccountController : Controller
     {
-        private readonly DataContext _context;
-        
+        private readonly IDataContext _context;
+        private IMongoCollection<AppUser> _dbCollection;
 
-        public AccountController(DataContext context)
+        public AccountController(IDataContext context, IOptions<TweetAppDatabaseSettings> options)
         {
             _context = context;
-            
+            _dbCollection = _context.tweetappdb.GetCollection<AppUser>(options.Value.UsersCollectionName);
+
         }
         [HttpPost,Route("register")]
         public async Task<ActionResult<AppUser>> Register(RegisterDto registerDto)
@@ -39,8 +43,8 @@ namespace TweetApp.Controllers
                     Password = registerDto.Password,
                     ContactNumber=registerDto.ContactNumber
                 };
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+
+                await _dbCollection.InsertOneAsync(user);
                 return new AppUser
                 {
                     FirstName = user.FirstName,
@@ -62,7 +66,8 @@ namespace TweetApp.Controllers
         {
             try
             {
-                var user = await _context.Users.SingleOrDefaultAsync(x => x.LoginId == loginDto.Username);
+                FilterDefinition<AppUser> filter = Builders<AppUser>.Filter.Eq("LoginId", loginDto.Username);
+                var user = await _dbCollection.FindAsync(filter).Result.SingleOrDefaultAsync();
                 if (user == null) return Unauthorized("Invalid username");
                 if (loginDto.Password != user.Password) return Unauthorized("Invalid password");
                 return new AppUser
@@ -83,7 +88,8 @@ namespace TweetApp.Controllers
         }
         private async Task<bool> UserExists(string loginId)
         {
-            return await _context.Users.AnyAsync(x => x.LoginId == loginId.ToLower());
+            FilterDefinition<AppUser> filter = Builders<AppUser>.Filter.Eq("LoginId", loginId.ToLower());
+            return await _dbCollection.FindAsync(filter).Result.AnyAsync();
         }
     }
 }
