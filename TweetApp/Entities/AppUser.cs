@@ -34,6 +34,7 @@ namespace TweetApp.Entities
         public string Password { get; set; }
         
         public long ContactNumber { get; set; }
+        public string ProfileImageUrl { get; set; }
         [JsonIgnore]
         public ICollection<Tweet> Tweets { get; set; }
     }

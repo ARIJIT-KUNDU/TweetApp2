@@ -13,6 +13,7 @@ namespace TweetApp.DAL.Interfaces
         public Task<IEnumerable<AppUser>> GetUsersAsync();
         public Task<AppUser> GetUserByIdAsync(int id);
         public Task<AppUser> GetUserByUsernameAsync(string username);
+        
        
     }
 }

@@ -74,6 +74,7 @@ namespace TweetApp.Controllers
                 return BadRequest("Error occurred while resetting password");
             }
         }
+        
 
 
     }
