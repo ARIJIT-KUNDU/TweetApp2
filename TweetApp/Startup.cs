@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -39,6 +40,7 @@ namespace TweetApp
             services.AddScoped<IUserRepository, UserRepository>();
             //services.AddScoped<iac>
             services.AddCors();
+            ConfigureMongoDb(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +54,7 @@ namespace TweetApp
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors(x=>x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
+            app.UseCors(x=>x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
 
             app.UseAuthorization();
 
@@ -60,6 +62,27 @@ namespace TweetApp
             {
                 endpoints.MapControllers();
             });
+        }
+        private void ConfigureMongoDb(IServiceCollection services)
+        {
+            var settings = GetMongoDbSettings();
+            var db = CreateMongoDatabase(settings);
+
+            AddMongoDbService<AuthorService, Author>(settings.AuthorsCollectionName);
+            AddMongoDbService<BookService, Book>(settings.BooksCollectionName);
+
+            void AddMongoDbService<TService, TModel>(string collectionName)
+            {
+                services.AddSingleton(db.GetCollection<TModel>(collectionName));
+                services.AddSingleton(typeof(TService));
+            }
+        }
+        private TweetAppDatabaseSettings GetMongoDbSettings() =>
+    Configuration.GetSection(nameof(TweetAppDatabaseSettings)).Get<TweetAppDatabaseSettings>();
+        private IMongoDatabase CreateMongoDatabase(TweetAppDatabaseSettings settings)
+        {
+            var client = new MongoClient(settings.ConnectionString);
+            return client.GetDatabase(settings.DatabaseName);
         }
     }
 }

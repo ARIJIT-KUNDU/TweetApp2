@@ -61,7 +61,7 @@ namespace TweetApp.Controllers
                 return BadRequest("Error occurred while registering");
             }
         }
-        [HttpGet,Route("login")]
+        [HttpPost,Route("login")]
         public async Task<ActionResult<AppUser>> Login(LoginDto loginDto)
         {
             try
