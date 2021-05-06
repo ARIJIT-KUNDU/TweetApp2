@@ -15,12 +15,12 @@ namespace TweetApp.Controllers
     public class TweetsController : Controller
     {
         private readonly ITweetRepository _tweetRepository;
-        private readonly DataContext _context;
+        
 
-        public TweetsController(ITweetRepository tweetRepository,DataContext context)
+        public TweetsController(ITweetRepository tweetRepository)
         {
             _tweetRepository = tweetRepository;
-            _context = context;
+            
         }
         
         [HttpGet,Route("{memberId}")]
@@ -39,24 +39,20 @@ namespace TweetApp.Controllers
 
 
         }
-        [HttpGet, Route("all")]
-        public async Task<ActionResult<IEnumerable<Tweet>>> GetTweets()
+
+        [HttpPost, Route("{memberId}/add")]
+        public async Task<ActionResult<Tweet>> AddTweet(string message,int id) 
         {
             try
             {
-                var tweets = await _tweetRepository.GetTweetsAsync();
-                return Ok(tweets);
+                var newTweet = await _tweetRepository.AddTweet(message, id);
+                return Ok(newTweet);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return BadRequest("Error occurred while getting tweets");
+                return BadRequest("Error occurred while adding tweet");
             }
         }
-        //[HttpPost, Route("{memberId}/add")]
-        //public async Task<Tweet> AddTweet(Tweet tweet)
-        //{
-
-        //}
 
     }
 }

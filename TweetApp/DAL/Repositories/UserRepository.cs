@@ -19,7 +19,7 @@ namespace TweetApp.DAL.Repositories
         public UserRepository(IDataContext context,IOptions<TweetAppDatabaseSettings> options)
         {
             _context = context;
-            _dbCollection = _context.tweetappdb.GetCollection<AppUser>(options.Value.TweetsCollectionName);
+            _dbCollection = _context.tweetappdb.GetCollection<AppUser>(options.Value.UsersCollectionName);
         }
         public async Task<AppUser> GetUserByIdAsync(int id)
         {

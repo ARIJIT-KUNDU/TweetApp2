@@ -11,17 +11,11 @@ namespace TweetApp.Services
     public class UserService
     {
         private readonly IMongoCollection<AppUser> _users;
-        public UserService(ITweetAppDatabaseSettings settings)
+        public UserService(IMongoCollection<AppUser> users)
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
-            _users = database.GetCollection<AppUser>(settings.UsersCollectionName);
+            
+            _users = users;
         }
-        public List<AppUser> Get()
-        {
-            List<AppUser> users;
-            users = _users.Find(user => true).ToList();
-            return users;
-        }
+        
     }
 }

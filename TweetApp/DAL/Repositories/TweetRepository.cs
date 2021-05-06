@@ -10,7 +10,7 @@ using TweetApp.Entities;
 
 namespace TweetApp.DAL.Repositories
 {
-    public class TweetRepository 
+    public class TweetRepository:ITweetRepository
     {
         private readonly IDataContext _context;
         private IMongoCollection<Tweet> _dbCollection;
@@ -37,37 +37,35 @@ namespace TweetApp.DAL.Repositories
                 throw ex;
             }
         }
-        //public void Update(AppUser user)
-        //{
-        //    try
-        //    {
-        //        _context.Entry(user).State = EntityState.Modified;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
-        //public async Task<IEnumerable<Tweet>> GetTweetsAsync()
-        //{
-        //    try
-        //    {
-        //        return await _context.Tweets.ToListAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
-        //public Task<IEnumerable<Tweet>> AddTweet(Tweet tweet)
-        //{
-        //    try
-        //    {
 
-        //    }
-        //    catch { }
-        //}
+
+
+
+        public async Task<Tweet> AddTweet(string message, int id)
+        {
+            try
+            {
+                FilterDefinition<Tweet> filter = Builders<Tweet>.Filter.Eq("AppUserId", id);
+                var newTweet = new Tweet
+                {
+                    Message = message,
+                    CreatedOn = DateTime.Now,
+                    AppUserId = id
+                };
+                await _dbCollection.InsertOneAsync(newTweet);
+                return new Tweet
+                {
+                    Message = newTweet.Message,
+                    CreatedOn = newTweet.CreatedOn,
+                    AppUserId = newTweet.AppUserId
+                };
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

@@ -38,9 +38,10 @@ namespace TweetApp
             services.AddSingleton<ITweetAppDatabaseSettings>(sp => sp.GetRequiredService<IOptions<TweetAppDatabaseSettings>>().Value);
             services.AddSingleton<IDataContext, DataContext>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITweetRepository, TweetRepository>();
             //services.AddScoped<iac>
             services.AddCors();
-            ConfigureMongoDb(services);
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,26 +64,6 @@ namespace TweetApp
                 endpoints.MapControllers();
             });
         }
-        private void ConfigureMongoDb(IServiceCollection services)
-        {
-            var settings = GetMongoDbSettings();
-            var db = CreateMongoDatabase(settings);
-
-            AddMongoDbService<AuthorService, Author>(settings.AuthorsCollectionName);
-            AddMongoDbService<BookService, Book>(settings.BooksCollectionName);
-
-            void AddMongoDbService<TService, TModel>(string collectionName)
-            {
-                services.AddSingleton(db.GetCollection<TModel>(collectionName));
-                services.AddSingleton(typeof(TService));
-            }
-        }
-        private TweetAppDatabaseSettings GetMongoDbSettings() =>
-    Configuration.GetSection(nameof(TweetAppDatabaseSettings)).Get<TweetAppDatabaseSettings>();
-        private IMongoDatabase CreateMongoDatabase(TweetAppDatabaseSettings settings)
-        {
-            var client = new MongoClient(settings.ConnectionString);
-            return client.GetDatabase(settings.DatabaseName);
-        }
+        
     }
 }
