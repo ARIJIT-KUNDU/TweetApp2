@@ -31,7 +31,8 @@ namespace TweetApp.Controllers
         {
             try
             {
-                if (await UserExists(registerDto.LoginId)) return BadRequest("Username is taken");
+                if (await UserExists(registerDto.LoginId)) return BadRequest("Login Id is taken");
+                if (await UserExists(registerDto.Email)) return BadRequest("Email is taken");
 
                 var user = new AppUser
                 {
