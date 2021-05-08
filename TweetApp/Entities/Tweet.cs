@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace TweetApp.Entities
@@ -23,5 +24,7 @@ namespace TweetApp.Entities
         public List<string> Replies { get; set; }
         [Required]
         public int AppUserId { get; set; }
+        [JsonIgnore]
+        public ICollection<TweetLike> LikedByUSer { get; set; }
     }
 }

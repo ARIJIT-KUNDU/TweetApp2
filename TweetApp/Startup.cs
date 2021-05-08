@@ -39,6 +39,7 @@ namespace TweetApp
             services.AddSingleton<IDataContext, DataContext>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITweetRepository, TweetRepository>();
+            services.AddScoped<ILikesRepository, LikesRepository>();
             //services.AddScoped<iac>
             services.AddCors();
             
