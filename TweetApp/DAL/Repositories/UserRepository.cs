@@ -21,6 +21,20 @@ namespace TweetApp.DAL.Repositories
             _context = context;
             _dbCollection = _context.tweetappdb.GetCollection<AppUser>(options.Value.UsersCollectionName);
         }
+
+        public async Task<IEnumerable<AppUser>> GetOtherUsers(string loginId)
+        {
+            try
+            {
+                FilterDefinition<AppUser> filter = Builders<AppUser>.Filter.Where(user => user.LoginId != loginId);
+                return await _dbCollection.FindAsync(filter).Result.ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<AppUser> GetUserByIdAsync(int id)
         {
             try
@@ -64,19 +78,21 @@ namespace TweetApp.DAL.Repositories
             }
         }
 
-        
 
-        //public async Task<bool> SaveAllAsync()
-        //{
-        //    try
-        //    {
-        //        return await _dbCollection.SaveChangesAsync() > 0;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
+
+        public async Task<ReplaceOneResult> SaveAllAsync(AppUser user)
+        {
+            try
+            {
+                return await _dbCollection.ReplaceOneAsync(m=>m.Id==user.Id,user);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        
 
         public void Update(AppUser user)
         {

@@ -74,8 +74,19 @@ namespace TweetApp.Controllers
                 return BadRequest("Error occurred while resetting password");
             }
         }
-        
-
+        [HttpGet,Route("getOtherUsers/{loginId}")]
+        public async Task<ActionResult<IEnumerable<AppUser>>> GetOtherUsers(string loginId)
+        {
+            try
+            {
+                var otherUsers = await _userRepository.GetOtherUsers(loginId);
+                return Ok(otherUsers);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest("Failed to get other users");
+            }
+        }
 
     }
 }

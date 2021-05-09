@@ -11,5 +11,6 @@ namespace TweetApp.DAL.Interfaces
         public Task<IEnumerable<Tweet>> GetTweetsAsync(int memberId);
         
         public Task<Tweet> AddTweet(string message,int id);
+        public Task<Tweet> GetTweetByTweetId(int tweetId);
     }
 }

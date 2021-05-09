@@ -67,5 +67,19 @@ namespace TweetApp.DAL.Repositories
                 throw ex;
             }
         }
+
+        public async Task<Tweet> GetTweetByTweetId(int tweetId)
+        {
+            try
+            {
+                FilterDefinition<Tweet> filter = Builders<Tweet>.Filter.Eq("Id", tweetId);
+
+                return await _dbCollection.FindAsync(filter).Result.FirstOrDefaultAsync();
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

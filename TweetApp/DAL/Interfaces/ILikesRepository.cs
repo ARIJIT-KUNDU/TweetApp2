@@ -11,6 +11,6 @@ namespace TweetApp.DAL.Interfaces
     {
         Task<TweetLike> GetTweetLike(int sourceUserId, int likedTweetId);
         Task<Tweet> GetTweetWithLikes(int tweetId);
-        Task<IEnumerable<LikeDto>> GetTweetLikes(string predicate, int userId);
+        Task<IEnumerable<LikeDto>> GetTweetLikes(string predicate, int userId,int tweetId);
     }
 }

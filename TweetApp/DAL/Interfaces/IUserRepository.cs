@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,11 +10,11 @@ namespace TweetApp.DAL.Interfaces
     public interface IUserRepository
     {
         public void Update(AppUser user);
-        //public Task<bool> SaveAllAsync();
+        public Task<ReplaceOneResult> SaveAllAsync(AppUser user);
         public Task<IEnumerable<AppUser>> GetUsersAsync();
         public Task<AppUser> GetUserByIdAsync(int id);
         public Task<AppUser> GetUserByUsernameAsync(string username);
-        
+        public Task<IEnumerable<AppUser>> GetOtherUsers(string loginId);
        
     }
 }
