@@ -1,3 +1,4 @@
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,7 +45,11 @@ namespace TweetApp
             services.AddScoped<ILikesRepository, LikesRepository>();
             //services.AddScoped<iac>
             services.AddCors();
-            
+            services.AddSwaggerGen();
+            var consumerConfig = new ConsumerConfig();
+            Configuration.Bind("consumer", consumerConfig);
+            services.AddSingleton<ConsumerConfig>(consumerConfig);
+            services.AddHostedService<MyKafkaConsumer>();
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -52,6 +57,13 @@ namespace TweetApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+
+                  
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                });
             }
 
             app.UseHttpsRedirection();

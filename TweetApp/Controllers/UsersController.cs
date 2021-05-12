@@ -56,7 +56,7 @@ namespace TweetApp.Controllers
             }
 
         }
-        [HttpGet, Route("{username}/forgot")]
+        [HttpPost, Route("{username}/forgot")]
         public async Task<ActionResult> ResetPassword(PasswordResetDto passwordResetDto, string username)
         {
 
