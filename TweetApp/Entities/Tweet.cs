@@ -26,5 +26,6 @@ namespace TweetApp.Entities
         public int AppUserId { get; set; }
         [JsonIgnore]
         public ICollection<TweetLike> LikedByUSer { get; set; }
+        public int commentsCount { get; set; }
     }
 }

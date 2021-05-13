@@ -33,7 +33,7 @@ namespace TweetApp.Entities
         [Required]
         public string Password { get; set; }
         [Required]
-        public long ContactNumber { get; set; }
+        public string ContactNumber { get; set; }
         
         [JsonIgnore]
         public ICollection<Tweet> Tweets { get; set; }

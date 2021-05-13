@@ -20,6 +20,6 @@ namespace TweetApp.DTOs
         [Required]
         public string Password { get; set; }
         [Required]
-        public long ContactNumber { get; set; }
+        public string ContactNumber { get; set; }
     }
 }

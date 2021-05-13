@@ -43,7 +43,7 @@ namespace TweetApp
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITweetRepository, TweetRepository>();
             services.AddScoped<ILikesRepository, LikesRepository>();
-            //services.AddScoped<iac>
+            services.AddScoped<ITweetCommentsRepository, TweetCommentsRepository>();
             services.AddCors();
             services.AddSwaggerGen();
             var consumerConfig = new ConsumerConfig();

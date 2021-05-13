@@ -43,21 +43,23 @@ namespace TweetApp.DAL.Repositories
 
 
 
-        public async Task<Tweet> AddTweet(string message, int id)
+        public async Task<Tweet> AddTweet(Tweet tweet)
         {
             try
             {
-                FilterDefinition<Tweet> filter = Builders<Tweet>.Filter.Eq("AppUserId", id);
+                FilterDefinition<Tweet> filter = Builders<Tweet>.Filter.Eq("AppUserId", tweet.AppUserId);
                 var newTweet = new Tweet
                 {
-                    Message = message,
+                    Message = tweet.Message,
+                    Tag=tweet.Tag,
                     CreatedOn = DateTime.Now,
-                    AppUserId = id
+                    AppUserId = tweet.AppUserId
                 };
                 await _dbCollection.InsertOneAsync(newTweet);
                 return new Tweet
                 {
                     Message = newTweet.Message,
+                    Tag=newTweet.Tag,
                     CreatedOn = newTweet.CreatedOn,
                     AppUserId = newTweet.AppUserId
                 };
@@ -68,13 +70,13 @@ namespace TweetApp.DAL.Repositories
             }
         }
 
-        public async Task<Tweet> GetTweetByTweetId(int tweetId)
+        public Tweet GetTweetByTweetId(int tweetId)
         {
             try
             {
                 FilterDefinition<Tweet> filter = Builders<Tweet>.Filter.Eq("Id", tweetId);
 
-                return await _dbCollection.FindAsync(filter).Result.FirstOrDefaultAsync();
+                return _dbCollection.Find(filter).FirstOrDefault();
             }
             catch(Exception ex)
             {

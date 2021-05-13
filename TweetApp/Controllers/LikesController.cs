@@ -28,30 +28,30 @@ namespace TweetApp.Controllers
         }
         [HttpPost("{tweetId}")]
         
-        public async Task<ActionResult> AddLike(int tweetId)
+        public void AddLike(int tweetId)
         {
-            try
-            {
-                var sourceUserId = 2;
-                var likedTweet = await _tweetRepository.GetTweetByTweetId(tweetId);
-                var sourceUser = await _userRepository.GetUserByIdAsync(sourceUserId);
-                if (likedTweet == null) return NotFound();
-                if (likedTweet.AppUserId == sourceUserId) return BadRequest("You cannot like your own tweet");
-                var tweetLike = await _likesRepository.GetTweetLike(sourceUserId, likedTweet.Id);
-                if (tweetLike != null) return BadRequest("You already like this tweet");
-                tweetLike = new TweetLike
-                {
-                    SourceUserId = sourceUserId,
-                    LikedTweetId = likedTweet.Id
-                };
-                sourceUser.LikedTweets.Add(tweetLike);
-                //if (await _userRepository.SaveAllAsync(sourceUser)) return Ok();
-                return BadRequest("Failed to like tweet");
-            }
-            catch(Exception ex)
-            {
-                return BadRequest("Error occurred while adding like");
-            }
+            //try
+            //{
+            //    var sourceUserId = 2;
+            //    var likedTweet = await _tweetRepository.GetTweetByTweetId(tweetId);
+            //    var sourceUser = await _userRepository.GetUserByIdAsync(sourceUserId);
+            //    if (likedTweet == null) return NotFound();
+            //    if (likedTweet.AppUserId == sourceUserId) return BadRequest("You cannot like your own tweet");
+            //    var tweetLike = await _likesRepository.GetTweetLike(sourceUserId, likedTweet.Id);
+            //    if (tweetLike != null) return BadRequest("You already like this tweet");
+            //    tweetLike = new TweetLike
+            //    {
+            //        SourceUserId = sourceUserId,
+            //        LikedTweetId = likedTweet.Id
+            //    };
+            //    sourceUser.LikedTweets.Add(tweetLike);
+            //    //if (await _userRepository.SaveAllAsync(sourceUser)) return Ok();
+            //    return BadRequest("Failed to like tweet");
+            //}
+            //catch(Exception ex)
+            //{
+            //    return BadRequest("Error occurred while adding like");
+            //}
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LikeDto>>> GetTweetLikes(string predicate)

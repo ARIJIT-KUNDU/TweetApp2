@@ -66,7 +66,7 @@ namespace TweetApp.Controllers
                 if (user.Password == passwordResetDto.OldPassword)
                     user.Password = passwordResetDto.NewPassword;
                 _userRepository.Update(user);
-                 return NoContent();
+                 return Ok("Successfully reset passowrd");
                 //return BadRequest("Failed to reset password");
             }
             catch (Exception ex)
@@ -87,6 +87,6 @@ namespace TweetApp.Controllers
                 return BadRequest("Failed to get other users");
             }
         }
-
+        
     }
 }
