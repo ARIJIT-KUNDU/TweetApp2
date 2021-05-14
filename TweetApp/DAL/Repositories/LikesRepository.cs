@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TweetApp.DAL.Interfaces;
 using TweetApp.DTOs;
@@ -12,35 +14,49 @@ namespace TweetApp.DAL.Repositories
 {
     public class LikesRepository : ILikesRepository
     {
-        private readonly IDataContext _context;
-        private IMongoCollection<TweetLike> _likesCollection;
-        private IMongoCollection<Tweet> _tweetsCollection;
-        private IMongoCollection<AppUser> _usersCollection;
-        public LikesRepository(IDataContext context, IOptions<TweetAppDatabaseSettings> options)
+        private readonly IMongoCollection<TweetLike> _tweetLikeData;
+        public LikesRepository(ITweetAppDatabaseSettings databaseSettings)
         {
-            _context = context;
-            _likesCollection = _context.tweetappdb.GetCollection<TweetLike>(options.Value.LikesCollectionName);
-            _tweetsCollection = _context.tweetappdb.GetCollection<Tweet>(options.Value.TweetsCollectionName);
-            _usersCollection=_context.tweetappdb.GetCollection<AppUser>(options.Value.UsersCollectionName);
+            var client = new MongoClient(databaseSettings.ConnectionString);
+            var database = client.GetDatabase(databaseSettings.DatabaseName);
+            _tweetLikeData = database.GetCollection<TweetLike>("LikeData");
         }
 
-        
-        public async Task<TweetLike> GetTweetLike(int sourceUserId, int likedTweetId)
+        public bool Create(TweetLike tweetLike)
+        {
+            bool isCreated = false;
+            try
+            {
+                _tweetLikeData.InsertOne(tweetLike);
+                isCreated = true;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            return isCreated;
+        }
+
+        public bool Delete(TweetLike unlike)
+        {
+            bool isDeleted = false;
+            try
+            {
+                var data = _tweetLikeData.DeleteOne(x => x.likeId.Equals(unlike.likeId) & x.tweetId.Equals(unlike.tweetId) & x.userId.Equals(unlike.userId));
+                isDeleted = true;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            return isDeleted;
+        }
+
+        public List<TweetLike> FindAll()
         {
             try
             {
-                var builder = Builders<TweetLike>.Filter;
-                List<FilterDefinition<TweetLike>> conditions = new List<FilterDefinition<TweetLike>>();
-
-                if (sourceUserId != 0)
-                    conditions.Add(builder.Where(x => x.SourceUserId == sourceUserId));
-
-                if (likedTweetId != 0)
-                    conditions.Add(builder.Where(x => x.LikedTweetId == likedTweetId));
-
-
-
-                return await _likesCollection.FindAsync(builder.And(conditions)).Result.FirstOrDefaultAsync();
+                return _tweetLikeData.Find(LikeModel => true).ToList();
             }
             catch(Exception ex)
             {
@@ -48,29 +64,11 @@ namespace TweetApp.DAL.Repositories
             }
         }
 
-        public async Task<IEnumerable<LikeDto>> GetTweetLikes(string predicate, int userId,int tweetId)
+        public List<TweetLike> FindAllByCondition(Expression<Func<TweetLike, bool>> expression)
         {
             try
             {
-                var tweets = _tweetsCollection.AsQueryable().OrderBy(t => t.Id);
-                var likes = _likesCollection.AsQueryable();
-                var users = _usersCollection.AsQueryable().OrderBy(t => t.Id);
-                if (predicate == "liked")
-                {
-                    likes = (MongoDB.Driver.Linq.IMongoQueryable<TweetLike>)likes.Where(like => like.SourceUserId == userId);
-                    tweets = (IOrderedQueryable<Tweet>)likes.Select(like => like.LikedTweet);
-                }
-                if (predicate == "likedBy")
-                {
-                    likes = (MongoDB.Driver.Linq.IMongoQueryable<TweetLike>)likes.Where(like => like.LikedTweetId == tweetId);
-                    users = (IOrderedQueryable<AppUser>)likes.Select(like => like.SourceUser);
-                }
-                //return await _usersCollection.Find(user => new LikeDto
-                //{
-                //    Id = user.Id,
-                //    LoginId = user.LoginId
-                //}).toListAsync();
-                throw new NotImplementedException();
+                return _tweetLikeData.Find(expression).ToList();
             }
             catch(Exception ex)
             {
@@ -78,16 +76,11 @@ namespace TweetApp.DAL.Repositories
             }
         }
 
-        
-
-        public async Task<Tweet> GetTweetWithLikes(int userId)
+        public TweetLike FindByCondition(Expression<Func<TweetLike, bool>> expression)
         {
             try
             {
-
-                FilterDefinition<Tweet> filter = Builders<Tweet>.Filter.Eq("AppUserId",userId);
-                return await _tweetsCollection.FindAsync(filter).Result.FirstOrDefaultAsync();
-                //throw new NotImplementedException();
+                return _tweetLikeData.Find(expression).FirstOrDefault();
             }
             catch(Exception ex)
             {

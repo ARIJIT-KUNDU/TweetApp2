@@ -15,13 +15,10 @@ namespace TweetApp.Entities
     [BsonIgnoreExtraElements]
     public class AppUser
     {
+        
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public ObjectId _id { get; set; }
-        
-        
-        [Required]
-        public int Id { get; set; }
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        public string UserId { get; set; }
         [Required]
         public string FirstName { get; set; }
         [Required]

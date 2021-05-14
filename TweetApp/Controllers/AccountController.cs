@@ -75,7 +75,7 @@ namespace TweetApp.Controllers
                 {
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                   
+                    UserId=user.UserId,
                     Email = user.Email,
                     LoginId=user.LoginId,
                     Password = user.Password,

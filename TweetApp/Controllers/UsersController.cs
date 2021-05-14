@@ -87,6 +87,20 @@ namespace TweetApp.Controllers
                 return BadRequest("Failed to get other users");
             }
         }
-        
+
+        [HttpGet, Route("getUserById/{userId}")]
+
+        public async Task<ActionResult<AppUser>> GetUserById(string userId)
+        {
+            try
+            {
+                return await _userRepository.GetUserByIdAsync(userId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error occurred while getting user details by username");
+            }
+
+        }
     }
 }

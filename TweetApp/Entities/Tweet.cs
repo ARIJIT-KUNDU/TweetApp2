@@ -11,19 +11,20 @@ namespace TweetApp.Entities
 {
     public class Tweet
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public ObjectId _id { get; set; }
         
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        public string TweetId { get; set; }
+
         [Required]
         public string Message { get; set; }
         [Required]
         public DateTime CreatedOn { get; set; }
         public string Tag { get; set; }
-        public List<string> Replies { get; set; }
+        public List<TweetComments> Replies { get; set; }
         [Required]
-        public int AppUserId { get; set; }
+        
+        public string AppUserId { get; set; }
         [JsonIgnore]
         public ICollection<TweetLike> LikedByUSer { get; set; }
         public int commentsCount { get; set; }

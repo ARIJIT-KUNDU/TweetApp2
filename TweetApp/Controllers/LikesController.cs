@@ -16,55 +16,42 @@ namespace TweetApp.Controllers
     [Authorize]
     public class LikesController : Controller
     {
-        private readonly IUserRepository _userRepository;
         private readonly ILikesRepository _likesRepository;
-        private readonly ITweetRepository _tweetRepository;
 
-        public LikesController(IUserRepository userRepository,ILikesRepository likesRepository,ITweetRepository tweetRepository)
+        public LikesController(ILikesRepository likesRepository)
         {
-            _userRepository = userRepository;
             _likesRepository = likesRepository;
-            _tweetRepository = tweetRepository;
         }
-        [HttpPost("{tweetId}")]
-        
-        public void AddLike(int tweetId)
-        {
-            //try
-            //{
-            //    var sourceUserId = 2;
-            //    var likedTweet = await _tweetRepository.GetTweetByTweetId(tweetId);
-            //    var sourceUser = await _userRepository.GetUserByIdAsync(sourceUserId);
-            //    if (likedTweet == null) return NotFound();
-            //    if (likedTweet.AppUserId == sourceUserId) return BadRequest("You cannot like your own tweet");
-            //    var tweetLike = await _likesRepository.GetTweetLike(sourceUserId, likedTweet.Id);
-            //    if (tweetLike != null) return BadRequest("You already like this tweet");
-            //    tweetLike = new TweetLike
-            //    {
-            //        SourceUserId = sourceUserId,
-            //        LikedTweetId = likedTweet.Id
-            //    };
-            //    sourceUser.LikedTweets.Add(tweetLike);
-            //    //if (await _userRepository.SaveAllAsync(sourceUser)) return Ok();
-            //    return BadRequest("Failed to like tweet");
-            //}
-            //catch(Exception ex)
-            //{
-            //    return BadRequest("Error occurred while adding like");
-            //}
-        }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetTweetLikes(string predicate)
+        [HttpPut,Route("{username}/like/{id}")]
+        public JsonResult TweetLikeUnlikeAction([FromBody] TweetLike tweetLikesModel)
         {
             try
             {
-                var tweets= await _likesRepository.GetTweetLikes(predicate, 2,2);
-                return Ok(tweets);
+                if (tweetLikesModel.liked == "like")
+                {
+                    tweetLikesModel.createdAt = DateTime.Now;
+                    var likeStatus = _likesRepository.Create(tweetLikesModel);
+                    if (likeStatus)
+                    {
+                        return new JsonResult("Tweet liked successfully");
+                    }
+                }
+                else
+                {
+                    var unlikeStatus = _likesRepository.Delete(tweetLikesModel);
+                    if (unlikeStatus)
+                    {
+                        return new JsonResult("Tweet unliked successfully");
+                    }
+                }
+
+
             }
-            catch(Exception ex)
+            catch (Exception)
             {
-                return BadRequest("Error occurred while getting tweet likes");
+                throw;
             }
+            return new JsonResult("Tweet not liked successfully");
         }
     }
 }

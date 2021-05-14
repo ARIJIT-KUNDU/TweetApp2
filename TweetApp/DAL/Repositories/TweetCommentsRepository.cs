@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace TweetApp.DAL.Repositories
             return _tweetCommentsData.Find(CommentModel => true).ToList(); ;
         }
 
-        public List<TweetComments> FindAllByCondition(int tweetId)
+        public List<TweetComments> FindAllByCondition(string tweetId)
         {
             return _tweetCommentsData.Find(x => x.tweetId.Equals(tweetId)).ToList();
         }
@@ -55,7 +56,7 @@ namespace TweetApp.DAL.Repositories
             bool isUpdated = false;
             try
             {
-                _tweetCommentsData.ReplaceOne(x => x.commentId.Equals(tweetComment.commentId), tweetComment);
+                _tweetCommentsData.ReplaceOne(x => x.CommentId.Equals(tweetComment.CommentId), tweetComment);
                 isUpdated = true;
             }
             catch (Exception)
@@ -65,12 +66,12 @@ namespace TweetApp.DAL.Repositories
             return isUpdated;
         }
 
-        public bool Delete(string tweetCommentId)
+        public bool Delete(ObjectId tweetCommentId)
         {
             bool isDeleted = false;
             try
             {
-                _tweetCommentsData.DeleteOne(x => x.commentId.Equals(tweetCommentId));
+                _tweetCommentsData.DeleteOne(x => x.CommentId.Equals(tweetCommentId));
                 isDeleted = true;
             }
             catch (Exception)

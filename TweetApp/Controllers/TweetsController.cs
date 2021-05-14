@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,9 @@ namespace TweetApp.Controllers
             _tweetCommentsRepository = tweetCommentsRepository;
         }
         
-        [HttpGet,Route("{memberId}")]
+        [HttpGet,Route("getTweets/{memberId}")]
 
-        public async Task<ActionResult<IEnumerable<Tweet>>> GetTweets(int memberId)
+        public async Task<ActionResult<IEnumerable<Tweet>>> GetTweets(string memberId)
         {
             try
             {
@@ -74,9 +75,9 @@ namespace TweetApp.Controllers
             return new JsonResult("Error");
         }
 
-        [Route("tweetById/{tweetId}/userId/{userID}")]
+        [Route("tweetById/{tweetId}/userId/{userId}")]
         [HttpGet]
-        public Tweet GetTweetById(int tweetId, string userId)
+        public Tweet GetTweetById(string tweetId, string userId)
         {
             Tweet tweet = new Tweet();
 
@@ -124,7 +125,7 @@ namespace TweetApp.Controllers
 
         [Route("tweetCommentsById/{tweetId}")]
         [HttpGet]
-        public List<TweetComments> GetTweetCommentsById(int tweetId)
+        public List<TweetComments> GetTweetCommentsById(string tweetId)
         {
             List<TweetComments> tweetCommentsModels = new List<TweetComments>();
             try
@@ -141,5 +142,81 @@ namespace TweetApp.Controllers
             return tweetCommentsModels;
         }
 
+        [HttpGet,Route("all")]
+        public async Task<ActionResult<Tweet>> GetAllTweetsAsync()
+        {
+            try
+            {
+                var tweets= await _tweetRepository.GetAllTweetsAsync();
+                return Ok(tweets);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest("Error occurred while getting all tweets");
+            }
+        }
+
+        [HttpGet,Route("{username}")]
+        public async Task<ActionResult<Tweet>> GetTweetsByUsername(string username)
+        {
+            try
+            {
+                var tweets = await _tweetRepository.GetTweetsByUsernameAsync(username);
+                return Ok(tweets);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest("Error occurred while getting tweets by username");
+            }
+        }
+
+        [HttpPut,Route("{username}/update/{id}")]
+        public JsonResult UpdateTweet([FromBody] Tweet tweetModel,string id)
+        {
+            bool status = false;
+            string response;
+            try
+            {
+                tweetModel.CreatedOn = DateTime.Now;
+                tweetModel.TweetId = id;
+                status = _tweetRepository.Update(tweetModel);
+                if (status)
+                {
+                    response = "Tweet updated";
+                }
+                else
+                {
+                    response = "Unable to update";
+                }
+            }
+            catch(Exception ex)
+            {
+                response = "error";
+                throw ex;
+            }
+            return new JsonResult(response);
+        }
+        [HttpDelete,Route("{username}/delete/{id}")]
+        public JsonResult DeleteTweet(string id)
+        {
+            bool status = false;
+            try
+            {
+                status = _tweetRepository.Delete(id);
+                if (status)
+                {
+                    return new JsonResult("Tweet deleted");
+                }
+                else
+                {
+                    return new JsonResult("Unable to delete tweet");
+                }
+            }
+            catch(Exception ex)
+            {
+                string message = "Message: " + ex.Message + " & Stacktrace: " + ex.StackTrace;
+            }
+            return new JsonResult("Error");
+        }
     }
 }

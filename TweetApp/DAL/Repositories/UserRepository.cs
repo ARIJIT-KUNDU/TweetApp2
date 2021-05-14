@@ -35,12 +35,12 @@ namespace TweetApp.DAL.Repositories
             }
         }
 
-        public async Task<AppUser> GetUserByIdAsync(int id)
+        public async Task<AppUser> GetUserByIdAsync(string id)
         {
             try
             {
                 
-                FilterDefinition<AppUser> filter = Builders<AppUser>.Filter.Eq("Id", id);
+                FilterDefinition<AppUser> filter = Builders<AppUser>.Filter.Eq("UserId", id);
 
                 return await _dbCollection.FindAsync(filter).Result.FirstOrDefaultAsync();
                 
@@ -84,7 +84,7 @@ namespace TweetApp.DAL.Repositories
         {
             try
             {
-                return await _dbCollection.ReplaceOneAsync(m=>m.Id==user.Id,user);
+                return await _dbCollection.ReplaceOneAsync(m=>m.UserId==user.UserId,user);
             }
             catch (Exception ex)
             {
@@ -98,7 +98,7 @@ namespace TweetApp.DAL.Repositories
         {
             try
             {
-                _dbCollection.ReplaceOne(m => m._id == user._id, user);
+                _dbCollection.ReplaceOne(m => m.UserId == user.UserId, user);
                 
             }
             catch (Exception ex)
