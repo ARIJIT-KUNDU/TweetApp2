@@ -94,25 +94,25 @@ namespace TweetApp.Controllers
                         tweet.commentsCount = tweetCommentsModels.Count;
                     }
                 }
-                //tweetCommentsModels = null;
+                tweetCommentsModels = null;
 
-                //List<TweetLikesModel> tweetLikesModel = new List<TweetLikesModel>();
+                List<TweetLike> tweetLikesModel = new List<TweetLike>();
 
-                //tweetLikesModel = GetTweetLikesByTweetId(tweetId);
-                //if (tweetLikesModel.Count != 0)
-                //{
-                //    if (tweetLikesModel[0].tweetId == tweetId)
-                //    {
-                //        tweet.likesCount = tweetLikesModel.Count;
-                //    }
-                //}
-                //tweetLikesModel = null;
+                tweetLikesModel = GetTweetLikesByTweetId(tweetId);
+                if (tweetLikesModel.Count != 0)
+                {
+                    if (tweetLikesModel[0].tweetId == tweetId)
+                    {
+                        tweet.likesCount = tweetLikesModel.Count;
+                    }
+                }
+                tweetLikesModel = null;
 
-                //var tweetLike = _tweetService.GetLikeByTweetIdandUserID(tweetId, userId);
-                //if (tweetLike != null)
-                //{
-                //    tweet.likeId = tweetLike.likeId;
-                //}
+                var tweetLike = _tweetService.GetLikeByTweetIdandUserID(tweetId, userId);
+                if (tweetLike != null)
+                {
+                    tweet.likeId = tweetLike.likeId;
+                }
 
             }
             catch (Exception ex)
@@ -159,9 +159,13 @@ namespace TweetApp.Controllers
         [HttpGet,Route("{username}")]
         public async Task<ActionResult<Tweet>> GetTweetsByUsername(string username)
         {
+            List<TweetLike> allLikes = new List<TweetLike>();
+            List<Tweet> allTweets = new List<Tweet>();
             try
             {
                 var tweets = await _tweetRepository.GetTweetsByUsernameAsync(username);
+                //get all likes for the DB
+                //allLikes=await _l
                 return Ok(tweets);
             }
             catch(Exception ex)

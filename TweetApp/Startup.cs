@@ -1,5 +1,6 @@
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -11,11 +12,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TweetApp.DAL.Interfaces;
 using TweetApp.DAL.Repositories;
@@ -42,7 +45,7 @@ namespace TweetApp
             services.AddSingleton<IDataContext, DataContext>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITweetRepository, TweetRepository>();
-            //services.AddScoped<ILikesRepository, LikesRepository>();
+            services.AddScoped<ILikesRepository, LikesRepository>();
             services.AddScoped<ITweetCommentsRepository, TweetCommentsRepository>();
             services.AddCors();
             services.AddSwaggerGen();
@@ -50,6 +53,7 @@ namespace TweetApp
             Configuration.Bind("consumer", consumerConfig);
             services.AddSingleton<ConsumerConfig>(consumerConfig);
             services.AddHostedService<MyKafkaConsumer>();
+            
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

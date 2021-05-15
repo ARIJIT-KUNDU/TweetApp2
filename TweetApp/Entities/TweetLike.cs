@@ -20,7 +20,7 @@ namespace TweetApp.Entities
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string userId { get; set; }
         public string username { get; set; }
-
+        
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         public DateTime createdAt { get; set; }

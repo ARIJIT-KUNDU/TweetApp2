@@ -13,7 +13,7 @@ namespace TweetApp.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version}/[controller]")]
-    [Authorize]
+    
     public class LikesController : Controller
     {
         private readonly ILikesRepository _likesRepository;
@@ -22,7 +22,7 @@ namespace TweetApp.Controllers
         {
             _likesRepository = likesRepository;
         }
-        [HttpPut,Route("{username}/like/{id}")]
+        [HttpPost,Route("{username}/like/{id}")]
         public JsonResult TweetLikeUnlikeAction([FromBody] TweetLike tweetLikesModel)
         {
             try
@@ -52,6 +52,22 @@ namespace TweetApp.Controllers
                 throw;
             }
             return new JsonResult("Tweet not liked successfully");
+        }
+
+        [HttpGet]
+        [Route("GetTweetLikesByTweetId/{tweetId}")]
+        public List<TweetLike> GetTweetLikesByTweetId(string tweetId)
+        {
+            List<TweetLike> tweetLikedModel = new List<TweetLike>();
+            try
+            {
+                tweetLikedModel = _likesRepository.FindAllByCondition(x=>x.tweetId.Equals(tweetId));
+            }
+            catch (Exception ex)
+            {
+                string message = "Meesage : " + ex.Message + " & Stacktrace: " + ex.StackTrace;
+            }
+            return tweetLikedModel;
         }
     }
 }
