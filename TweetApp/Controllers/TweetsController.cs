@@ -17,11 +17,13 @@ namespace TweetApp.Controllers
     {
         private readonly ITweetRepository _tweetRepository;
         private readonly ITweetCommentsRepository _tweetCommentsRepository;
+        private readonly ILikesRepository _likesRepository;
 
-        public TweetsController(ITweetRepository tweetRepository,ITweetCommentsRepository tweetCommentsRepository)
+        public TweetsController(ITweetRepository tweetRepository,ITweetCommentsRepository tweetCommentsRepository,ILikesRepository likesRepository)
         {
             _tweetRepository = tweetRepository;
             _tweetCommentsRepository = tweetCommentsRepository;
+            _likesRepository = likesRepository;
         }
         
         [HttpGet,Route("getTweets/{memberId}")]
@@ -108,7 +110,7 @@ namespace TweetApp.Controllers
                 }
                 tweetLikesModel = null;
 
-                var tweetLike = _tweetService.GetLikeByTweetIdandUserID(tweetId, userId);
+                var tweetLike = _likesRepository.FindByCondition(x=>x.tweetId.Equals(tweetId) & x.userId.Equals(userId));
                 if (tweetLike != null)
                 {
                     tweet.likeId = tweetLike.likeId;
@@ -221,6 +223,22 @@ namespace TweetApp.Controllers
                 string message = "Message: " + ex.Message + " & Stacktrace: " + ex.StackTrace;
             }
             return new JsonResult("Error");
+        }
+
+        [HttpGet]
+        [Route("GetTweetLikesByTweetId/{tweetId}")]
+        public List<TweetLike> GetTweetLikesByTweetId(string tweetId)
+        {
+            List<TweetLike> tweetLikedModel = new List<TweetLike>();
+            try
+            {
+                tweetLikedModel = _likesRepository.FindAllByCondition(x=>x.tweetId.Equals(tweetId));
+            }
+            catch (Exception ex)
+            {
+                string message = "Meesage : " + ex.Message + " & Stacktrace: " + ex.StackTrace;
+            }
+            return tweetLikedModel;
         }
     }
 }

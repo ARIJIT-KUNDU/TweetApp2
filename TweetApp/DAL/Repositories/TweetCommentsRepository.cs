@@ -23,17 +23,38 @@ namespace TweetApp.DAL.Repositories
 
         public List<TweetComments> FindAll()
         {
-            return _tweetCommentsData.Find(CommentModel => true).ToList(); ;
+            try
+            {
+                return _tweetCommentsData.Find(CommentModel => true).ToList();
+            } 
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public List<TweetComments> FindAllByCondition(string tweetId)
         {
-            return _tweetCommentsData.Find(x => x.tweetId.Equals(tweetId)).ToList();
+            try
+            {
+                return _tweetCommentsData.Find(x => x.tweetId.Equals(tweetId)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public TweetComments FindByCondition(Expression<Func<TweetComments, bool>> expression)
         {
-            return _tweetCommentsData.Find(expression).FirstOrDefault();
+            try
+            {
+                return _tweetCommentsData.Find(expression).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public bool Create(TweetComments tweetComment)
@@ -44,9 +65,9 @@ namespace TweetApp.DAL.Repositories
                 _tweetCommentsData.InsertOne(tweetComment);
                 isCreated = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
             return isCreated;
         }
