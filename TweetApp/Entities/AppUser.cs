@@ -36,5 +36,6 @@ namespace TweetApp.Entities
         public ICollection<Tweet> Tweets { get; set; }
         [JsonIgnore]
         public ICollection<TweetLike> LikedTweets { get; set; }
+        public string token { get; set; }
     }
 }

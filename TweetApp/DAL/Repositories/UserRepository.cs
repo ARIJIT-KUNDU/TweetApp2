@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TweetApp.DAL.Interfaces;
 using TweetApp.Entities;
@@ -14,13 +15,17 @@ namespace TweetApp.DAL.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly IDataContext _context;
+        
         private IMongoCollection<AppUser> _dbCollection;
 
         public UserRepository(IDataContext context,IOptions<TweetAppDatabaseSettings> options)
         {
             _context = context;
+            
             _dbCollection = _context.tweetappdb.GetCollection<AppUser>(options.Value.UsersCollectionName);
         }
+
+        
 
         public async Task<IEnumerable<AppUser>> GetOtherUsers(string loginId)
         {

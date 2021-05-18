@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using TweetApp.DAL.Interfaces;
 using TweetApp.DTOs;
 using TweetApp.Entities;
-using TweetApp.Services;
 
 namespace TweetApp.Controllers
 {
@@ -19,13 +23,12 @@ namespace TweetApp.Controllers
         
         
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _config;
 
-        public UsersController(IUserRepository userRepository)
+        public UsersController(IUserRepository userRepository,IConfiguration config)
         {
-
-            
-           
             _userRepository = userRepository;
+            _config = config;
         }
         [HttpGet,Route("all")]
 
@@ -102,5 +105,7 @@ namespace TweetApp.Controllers
             }
 
         }
+
+        
     }
 }

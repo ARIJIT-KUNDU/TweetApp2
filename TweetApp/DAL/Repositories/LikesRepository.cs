@@ -42,7 +42,7 @@ namespace TweetApp.DAL.Repositories
             bool isDeleted = false;
             try
             {
-                var data = _tweetLikeData.DeleteOne(x => x.likeId.Equals(unlike.likeId) & x.tweetId.Equals(unlike.tweetId) & x.userId.Equals(unlike.userId));
+                var data = _tweetLikeData.DeleteOne(x=>x.tweetId.Equals(unlike.tweetId) & x.userId.Equals(unlike.userId));
                 isDeleted = true;
             }
             catch(Exception ex)
