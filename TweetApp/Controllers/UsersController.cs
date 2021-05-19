@@ -60,7 +60,7 @@ namespace TweetApp.Controllers
 
         }
         [HttpPost, Route("{username}/forgot")]
-        public async Task<ActionResult> ResetPassword(PasswordResetDto passwordResetDto, string username)
+        public async Task<JsonResult> ResetPassword(PasswordResetDto passwordResetDto, string username)
         {
 
             try
@@ -69,13 +69,14 @@ namespace TweetApp.Controllers
                 if (user.Password == passwordResetDto.OldPassword)
                     user.Password = passwordResetDto.NewPassword;
                 _userRepository.Update(user);
-                 return Ok("Successfully reset passowrd");
+                 return new JsonResult("Successfully reset passowrd");
                 //return BadRequest("Failed to reset password");
             }
             catch (Exception ex)
             {
-                return BadRequest("Error occurred while resetting password");
+                throw ex;
             }
+            
         }
         [HttpGet,Route("getOtherUsers/{loginId}")]
         public async Task<ActionResult<IEnumerable<AppUser>>> GetOtherUsers(string loginId)
