@@ -31,17 +31,22 @@ namespace TweetApp.Entities
         }
         private async Task StartConsumer(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            { //read user from kafka  
-                using (var consumer = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
+            CancellationTokenSource cts = new CancellationTokenSource();
+            Console.CancelKeyPress += (_, e) =>
+            {
+                e.Cancel = true;
+                cts.Cancel();
+            };
+            using(var c=new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
+            {
+                //c.Subscribe(_topicName);
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    consumer.Subscribe("kafkaListenTopic_From_Producer");
-                    var consumeResult = consumer.Consume().Message.Value;
-                    //if (!consumeResult.IsNullOrEmpty())
-                    //{ //write your business logic to invoke IMyBusinessServices here  
-                    //}
+                    var cr = c.Consume(cts.Token);
+                    Console.WriteLine($"Consumed messages '{cr.Message.Value}' at '{cr.TopicPartitionOffset}'");
                 }
             }
+            throw new NotImplementedException();
         }
     }
 }

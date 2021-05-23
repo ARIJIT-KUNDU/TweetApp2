@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using Prometheus;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -49,15 +50,38 @@ namespace TweetApp
             services.AddScoped<ITweetCommentsRepository, TweetCommentsRepository>();
             services.AddCors();
             services.AddSwaggerGen();
-            var consumerConfig = new ConsumerConfig();
-            Configuration.Bind("consumer", consumerConfig);
-            services.AddSingleton<ConsumerConfig>(consumerConfig);
+            
             services.AddHostedService<MyKafkaConsumer>();
+            services.AddSingleton<ConsumerConfig>(option =>
+            {
+                ConsumerConfig config = new ConsumerConfig();
+                config.BootstrapServers = Configuration.GetValue<string>("KafkaConsumer:BootstrapServers");
+                config.SaslUsername = Configuration.GetValue<string>("KafkaConsumer:SaslUsername");
+                config.SaslPassword = Configuration.GetValue<string>("KafkaConsumer:SaslPassword");
+                config.SaslMechanism = SaslMechanism.Plain;
+                config.SecurityProtocol = SecurityProtocol.SaslSsl;
+                config.GroupId = Guid.NewGuid().ToString();
+                config.AutoOffsetReset = AutoOffsetReset.Earliest;
+                return config;
+            });
             
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Custom Metrics to count requests for each endpoint and the method
+            var counter = Metrics.CreateCounter("tweetappapi_path_counter", "Counts requests to the Tweetapp API endpoints", new CounterConfiguration
+            {
+                LabelNames = new[] { "method", "endpoint" }
+            });
+            app.Use((context, next) =>
+            {
+                counter.WithLabels(context.Request.Method, context.Request.Path).Inc();
+                return next();
+            });
+            // Use the Prometheus middleware
+            app.UseMetricServer();
+            app.UseHttpMetrics();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -81,6 +105,7 @@ namespace TweetApp
             {
                 endpoints.MapControllers();
             });
+            
         }
         
     }
