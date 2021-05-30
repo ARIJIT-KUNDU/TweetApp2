@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>72b7c5b0-4f4b-4f9a-a86d-5a12124e3454</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
     <!--<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>-->
   </PropertyGroup>
 
@@ -40,7 +41,7 @@
 
   <ItemGroup>
     <None Update="..\.dockerignore">
-      <DependentUpon>dockerfile</DependentUpon>
+      <DependentUpon>Dockerfile</DependentUpon>
     </None>
   </ItemGroup>
 
