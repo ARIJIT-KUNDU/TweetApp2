@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tweetappapi-deployment
+spec:
+  selector:
+    matchLabels:
+      app: tweetappapi-pod
+    replica: 3
+  template:
+    metadata:
+      labels:
+        app: tweetappapi-pod
+    spec:
+      containers:
+      - name: tweetappapi-kubernetes-container
+        image: tweetappapi
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
