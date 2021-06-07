@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tweetappapi-deployment
+spec:
+  selector:
+    matchLabels:
+      app: tweetappapi-pod
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: tweetappapi-pod
+    spec:
+      containers:
+      - name: tweetappapi-kubernetes-container
+        image: tweetapp_web
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+             
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: tweetappapi-service
+spec:
+  selector:
+    app: tweetappapi-pod
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 31500
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tweetappui-deployment
+spec:
+  selector:
+    matchLabels:
+      app: tweetappui-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tweetappui-pod
+    spec:
+      containers:
+        - name: tweetappui-kubernetes-container
+          image: tweetappui
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              protocol: TCP 
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"          
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+    labels:
+      name: tweetappui-service
+    name: tweetappui-service
+spec:
+    ports:
+    - port: 80
+      protocol: TCP
+      
+    selector:
+        app: tweetappui-pod
+    type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: tweetappui-service 
+  name: service-name-loadbalancer
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: tweetappui-pod
+
